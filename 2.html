@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="time"></div>
+    <div id="date"></div>
+    <script>
+        var count = 0,
+            lastStr = ''
+        setInterval(function () {
+            if(count % 60 == 0){
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var arr = JSON.parse(xhr.responseText);
+                        show(arr[0].data.time)
+                    }
+                }
+                xhr.open("GET", "http://193.112.112.108:3001/", true);
+                xhr.send();
+            }else{
+                var timestamp = (new Date(lastStr)).getTime() + 1000
+                var time = formatTime(timestamp)
+                show(time)
+            }
+  
+        }, 1000)
+
+        function show(timeStr){
+            var _arr = timeStr.split(' ')
+            document.getElementById('time').innerHTML = _arr[1]
+            document.getElementById('date').innerHTML = _arr[0]
+            count++
+            lastStr= timeStr.replace(/-/gi,'/')
+        }
+        var formatTime = (timestamp) => {
+            timestamp = Number(timestamp)
+            var d = new Date(timestamp)
+            var addZero = num => {
+                num = Number(num)
+                return num > 9 ? num : ('0' + num)
+            }
+            return d.getFullYear() + '-' + addZero(d.getMonth() + 1) + '-' + addZero(d.getDate()) + ' ' + addZero(d.getHours()) + ':' + addZero(d.getMinutes()) + ':' + addZero(d.getSeconds())
+        }
+    </script>
+</body>
+
+</html>
